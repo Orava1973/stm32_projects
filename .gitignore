@@ -1,17 +1,26 @@
-# STM32CubeIDE build folders
-*/Debug/
-*/Release/
-
-# Eclipse / STM32CubeIDE settings
-*/.settings/
-*.launch
+# STM32CubeIDE workspace (NEVER commit)
+workspace/
+.metadata/
 
 # Build artifacts
-*.o
-*.d
-*.elf
-*.map
+Debug/
+Release/
+**/Debug/
+**/Release/
 
-# OS files
+# Eclipse / CubeIDE
+.settings/
+*.launch
+*.log
+
+# Object / build files
+*.o
+*.su
+*.cyclo
+*.d
+*.map
+*.elf
+
+# OS
 .DS_Store
 Thumbs.db
