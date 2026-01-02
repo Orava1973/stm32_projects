@@ -1,102 +1,120 @@
 # STM32 Projects (Embedded Portfolio)
 
-This repository contains a collection of **STM32 embedded projects** developed using **STM32CubeIDE** and **HAL drivers**.  
-The primary goal of this repository is to serve as a **clean, reusable base template** and a growing **portfolio for Embedded Developer roles**.
+This repository contains a collection of **STM32 embedded projects** developed using **STM32CubeIDE** and **STM32 HAL drivers**.
+
+The primary goal of this repository is to serve as a **clean, reusable base template** and a growing **public portfolio** for **Embedded / Firmware Developer roles**.
+
+The projects demonstrate:
+- clean embedded architecture
+- event-driven design
+- interrupt-safe patterns
+- scalable project structure
+- professional Git workflow
 
 ---
 
 ## 🔧 Target Platform
 
-- **MCU:** STM32 (tested on Nucleo-F103RB)
+- **MCU:** STM32 (tested on NUCLEO-F103RB)
 - **IDE:** STM32CubeIDE
 - **Framework:** STM32 HAL
-- **Language:** C (with C++ planned)
-- **OS:** Bare-metal (RTOS projects planned)
+- **Language:** C (C++ planned)
+- **OS:** Bare-metal (FreeRTOS planned)
 
 ---
 
 ## 📁 Repository Structure
 
-stm32_projects/
+STM32_Projects/
+├── README.md # Repository overview (this file)
 │
-├── TIM_based_LED_blink/
+├── templates/ # Stable reference templates
 │ └── TIM_based_LED_blink/
-│ ├── Core/
-│ ├── Drivers/
-│ ├── STM32CubeMX (.ioc)
-│ └── README.md (project-specific description)
 │
-├── .gitignore
-├── README.md
+├── projects/ # Independent STM32 projects
+│ └── GPIO_Button_EXTI/
+│ └── README.md # Project-specific description
+│
+└── workspace/ # Local STM32CubeIDE workspace (gitignored)
 
 
-Each subdirectory represents an **independent STM32 project** that can be opened directly in STM32CubeIDE.
+Each folder under `templates/` and `projects/` is a **standalone STM32CubeIDE project** that can be opened and built independently.
 
 ---
 
-## 🧱 Base Template (Key Project)
+## 🧱 Templates (Base Architectures)
 
-### `TIM_based_LED_blink`
+### TIM_based_LED_blink
 
 A **base embedded template** demonstrating best practices:
 
 - TIM2 used as **system tick (2 ms)**
-- Interrupt-driven timing (no `HAL_Delay` in main logic)
+- Interrupt-driven timing
+- **No `HAL_Delay()`** in application logic
 - ISR contains **only counters and event flags**
 - Main loop handles **all hardware actions**
 - Clear separation between:
   - timekeeping
-  - event handling
+  - event generation
   - application logic
 
-This project is used as a **starting point for all future STM32 projects** in this repository.
+This template is used as the **architectural foundation** for all projects in `projects/`.
 
 ---
 
-## 🛡 Branch Policy
+## 🧪 Projects
 
-- `main` branch is **protected**
-- Direct pushes to `main` are **not allowed**
-- All changes must go through:
+### GPIO_Button_EXTI
 
-feature branch → Pull Request → Merge
+Button handling using **EXTI interrupts** with a clean event-driven architecture:
 
-- This guarantees a **stable and reproducible template**
+- External interrupt (EXTI) on USER button
+- Software debounce
+- ISR-safe event signaling
+- Main-loop-driven logic
+- Preparation for **FSM-based button handling**
+
+This project demonstrates how to evolve from a minimal template
+to real input-handling logic.
+
+See `projects/GPIO_Button_EXTI/README.md` for details.
 
 ---
 
-## 🚀 Development Workflow
+## 🛡 Git & Branch Policy
 
-Typical workflow for new projects:
+- `main` branch is **stable**
+- Development is done in **feature branches**
+- Typical workflow:
 
-```bash
-git checkout -b feature_new_project
-# develop
-git commit -m "Add new STM32 project"
-git push origin feature_new_project
-# Open Pull Request on GitHub
+feature/* → commit → push → merge to main
 
-📌 Roadmap
+
+This guarantees:
+- clean history
+- reproducible builds
+- safe experimentation
+
+---
+
+## 🚀 Roadmap
 
 Planned future additions:
 
-UART (interrupt & DMA)
+- Button FSM (short / long press)
+- UART (interrupt & DMA)
+- SPI / I2C drivers
+- Event framework
+- FreeRTOS-based projects
+- Power management & low-power modes
+- C++ abstraction layers
+- CI / build checks (GitHub Actions)
 
-SPI / I2C drivers
+---
 
-Button handling & debouncing
+## 👤 Author
 
-FreeRTOS-based projects
-
-Power management & low-power modes
-
-C++ abstraction layers
-
-Unit-testing / build checks (GitHub Actions)
-
-👤 Author
-
-Vadim (Orava1973)
+**Vadim (Orava1973)**  
 Embedded / Systems Engineer (in progress)
 
 This repository is actively maintained and expanded as part of professional growth in embedded systems development.
