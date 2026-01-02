@@ -1,21 +1,36 @@
-# ===== STM32CubeIDE / Eclipse =====
+# =========================
+# STM32CubeIDE / Eclipse
+# =========================
 .metadata/
 workspace/
 .settings/
 *.launch
+*.log
 
-# ===== Build artifacts =====
+# =========================
+# Build artifacts
+# =========================
 Debug/
 Release/
-*.o
+build/
 *.elf
+*.hex
+*.bin
 *.map
-*.su
-*.cyclo
 
-# ===== CubeMX =====
+# =========================
+# CubeMX
+# =========================
 *.mxproject
 
-# ===== OS =====
+# =========================
+# OS / Editor junk
+# =========================
 .DS_Store
 Thumbs.db
+*.swp
+
+# =========================
+# Git
+# =========================
+*.orig
