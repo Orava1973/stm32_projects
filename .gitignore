@@ -1,26 +1,21 @@
-# STM32CubeIDE workspace (NEVER commit)
-workspace/
+# ===== STM32CubeIDE / Eclipse =====
 .metadata/
-
-# Build artifacts
-Debug/
-Release/
-**/Debug/
-**/Release/
-
-# Eclipse / CubeIDE
+workspace/
 .settings/
 *.launch
-*.log
 
-# Object / build files
+# ===== Build artifacts =====
+Debug/
+Release/
 *.o
+*.elf
+*.map
 *.su
 *.cyclo
-*.d
-*.map
-*.elf
 
-# OS
+# ===== CubeMX =====
+*.mxproject
+
+# ===== OS =====
 .DS_Store
 Thumbs.db
