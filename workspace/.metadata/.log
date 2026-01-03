@@ -1,0 +1,34 @@
+!SESSION 2025-12-31 00:26:07.063 -----------------------------------------------
+eclipse.buildId=Version 2.0.0
+java.version=21.0.8
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=ru_RU
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 -data D:\STM32 Project\STM32_Projects\workspace
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 1 1 2025-12-31 00:26:13.663
+!MESSAGE Log4j2 initialized with config file D:\STM32 Project\STM32_Projects\workspace\.metadata\.log4j2.xml
+
+!ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2025-12-31 00:26:18.371
+!MESSAGE Started RMI Server, listening on port 41337
+
+!ENTRY com.st.stm32cube.ide.mpu.remote.serial 1 1 2025-12-31 00:26:24.085
+!MESSAGE Executed PowerShell command powershell.exe -Command "Get-CimInstance -ClassName Win32_SerialPort | Select-Object -ExpandProperty DeviceID":
+COM4
+COM3
+COM5
+
+
+!ENTRY com.st.stm32cube.ide.mpu.remote.serial 1 1 2025-12-31 00:26:24.087
+!MESSAGE port: COM4
+
+!ENTRY com.st.stm32cube.ide.mpu.remote.serial 1 1 2025-12-31 00:26:24.087
+!MESSAGE port: COM3
+
+!ENTRY com.st.stm32cube.ide.mpu.remote.serial 1 1 2025-12-31 00:26:24.088
+!MESSAGE port: COM5
+
+!ENTRY org.eclipse.cdt.core 1 0 2025-12-31 00:30:43.322
+!MESSAGE Indexed 'TIM_based_LED_blink' (20 sources, 108 headers) in 3,3 sec: 9 520 declarations; 48 338 references; 6 unresolved inclusions; 945 syntax errors; 1 142 unresolved names (1,9 %)
+
+!ENTRY org.eclipse.cdt.core 1 0 2025-12-31 00:45:55.427
+!MESSAGE Indexed 'GPIO_Button_EXTI' (3 sources, 53 headers) in 0,336 sec: 1 954 declarations; 2 862 references; 0 unresolved inclusions; 1 syntax errors; 2 unresolved names (0,042 %)
