@@ -1,0 +1,23 @@
+# STM32CubeIDE build folders
+*/Debug/
+*/Release/
+
+# Eclipse / STM32CubeIDE settings
+*/.settings/
+*.launch
+
+# Build artifacts
+*.o
+*.d
+*.elf
+*.map
+*.hex
+*.bin
+
+# IDE
+.settings/
+*.launch
+
+# OS files
+.DS_Store
+Thumbs.db
