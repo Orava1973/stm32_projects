@@ -29,7 +29,7 @@
 static volatile uint32_t btn_time_ms = 0;
 static uint8_t Button_IsPressed(void)
 {
-    return (HAL_GPIO_ReadPin(USER_BUTTON_GPIO_Port, USER_BUTTON_Pin) == GPIO_PIN_SET);
+    return (HAL_GPIO_ReadPin(USER_BUTTON_GPIO_Port, USER_BUTTON_Pin) == GPIO_PIN_RESET);
 }
 
 
@@ -46,7 +46,7 @@ void Button_Init(ButtonCtx_t *btn)
 void Button_OnExti(ButtonCtx_t *btn)
 {
 	if (btn->state == BTN_STATE_IDLE) {
-	        btn->state = BTN_STATE_DEBOUNCE;
+	        btn->state = BTN_STATE_PRESSED;
 	        btn->timestamp = btn_time_ms;
 	    }
 }
@@ -65,7 +65,7 @@ void Button_Process(ButtonCtx_t *btn)
         /* nothing to do */
         break;
 
-    case BTN_STATE_DEBOUNCE:
+   /* case BTN_STATE_DEBOUNCE:
         if ((btn_time_ms - btn->timestamp) >= BTN_DEBOUNCE_MS) {
             if (Button_IsPressed()) {
                 btn->state = BTN_STATE_PRESSED;
@@ -73,11 +73,12 @@ void Button_Process(ButtonCtx_t *btn)
                 btn->state = BTN_STATE_IDLE;
             }
         }
-        break;
+        break;*/
 
     case BTN_STATE_PRESSED:
         if (!Button_IsPressed()) {
             btn->short_press = 1;
+
             btn->state = BTN_STATE_IDLE;
         }
         break;
@@ -91,7 +92,10 @@ void Button_Process(ButtonCtx_t *btn)
 
 uint8_t Button_WasShortPressed(ButtonCtx_t *btn)
 {
-    (void)btn;
+	 if (btn->short_press) {
+	        btn->short_press = 0;
+	        return 1;
+	    }
     return 0;
 }
 
