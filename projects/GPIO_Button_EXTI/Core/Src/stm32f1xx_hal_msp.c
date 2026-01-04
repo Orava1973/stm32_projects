@@ -60,6 +60,8 @@
 /**
   * Initializes the Global MSP.
   */
+
+
 void HAL_MspInit(void)
 {
 

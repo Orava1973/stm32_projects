@@ -106,27 +106,28 @@ int main(void)
   MX_USART2_UART_Init();
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
+  //ButtonCtx_t user_button;
   HAL_TIM_Base_Start_IT(&htim2);
   Button_Init(&user_button);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-	while (1) {
+  while (1)
+  {
+      Button_Process(&user_button);
 
-		/* Button FSM processing */
-		if (Button_WasShortPressed(&user_button)) {
-		    HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
-		}
-		/* Existing LED blink logic */
-		if (event_led_toggle > 0) {
-			event_led_toggle--;
-			HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
-		}
+      if (Button_WasShortPressed(&user_button))
+      {
+         // HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+      }
+  }
+
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-  }
+  //}
   /* USER CODE END 3 */
 }
 
@@ -173,21 +174,26 @@ void SystemClock_Config(void)
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 	if (htim->Instance == TIM2) {
 
+		/* FSM button tick */
+		Button_OnTick(&user_button);
+
 		/* existing system tick logic */
-		if (++sys_tick_ms >= (LED_BLINK_PERIOD_MS / SYS_TICK_PERIOD_MS)) {
+		/*if (++sys_tick_ms >= (LED_BLINK_PERIOD_MS / SYS_TICK_PERIOD_MS)) {
 			event_led_toggle++;
-			sys_tick_ms = 0;
+			sys_tick_ms = 0;*/
+		//HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+		//HAL_Delay(200);
 		}
 
-		 /* FSM button tick */
-		 Button_OnTick(&user_button);
-	}
+
+	//}
 }
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
     if (GPIO_Pin == USER_BUTTON_Pin) {
-        Button_OnExti(&user_button);
+        //Button_OnExti(&user_button);
+    	HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
     }
 }
 
