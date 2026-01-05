@@ -48,8 +48,14 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
+typedef enum {
+    LED_MODE_OFF = 0,
+    LED_MODE_BLINK,
+    LED_MODE_ON
+} LedMode_t;
 volatile uint32_t sys_tick_ms = 0;
 volatile uint32_t event_led_toggle = 0;
+volatile LedMode_t led_mode = LED_MODE_OFF;
 ButtonCtx_t user_button;
 /* USER CODE END PV */
 
@@ -117,12 +123,28 @@ int main(void)
   {
       Button_Process(&user_button);
 
-      if (Button_WasShortPressed(&user_button))
-      {
-         // HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+      /* long press → LED ON */
+      if (Button_WasLongPressed(&user_button)) {
+          led_mode = LED_MODE_ON;
+      }
+
+      /* short press */
+      if (Button_WasShortPressed(&user_button)) {
+          if (led_mode == LED_MODE_OFF) {
+              led_mode = LED_MODE_BLINK;
+          } else {
+              led_mode = LED_MODE_OFF;
+          }
+      }
+
+      /* LED state handling */
+      if (led_mode == LED_MODE_ON) {
+          HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
+      }
+      else if (led_mode == LED_MODE_OFF) {
+          HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
       }
   }
-
 
     /* USER CODE END WHILE */
 
@@ -171,31 +193,30 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
-	if (htim->Instance == TIM2) {
-
-		/* FSM button tick */
-		Button_OnTick(&user_button);
-
-		/* existing system tick logic */
-		/*if (++sys_tick_ms >= (LED_BLINK_PERIOD_MS / SYS_TICK_PERIOD_MS)) {
-			event_led_toggle++;
-			sys_tick_ms = 0;*/
-		//HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
-		//HAL_Delay(200);
-		}
-
-
-	//}
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+    if (htim->Instance == TIM2)
+    {
+    	//HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin); // DEBUG
+    	Button_OnTick(&user_button);
+        if (led_mode == LED_MODE_BLINK)
+        {
+            if (++sys_tick_ms >= (LED_BLINK_PERIOD_MS / SYS_TICK_PERIOD_MS))
+            {
+                HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+                sys_tick_ms = 0;
+            }
+        }
+    }
 }
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
     if (GPIO_Pin == USER_BUTTON_Pin) {
-        //Button_OnExti(&user_button);
-    	HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+        Button_OnExti(&user_button);
     }
 }
+
 
 /* USER CODE END 4 */
 
