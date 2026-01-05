@@ -30,9 +30,10 @@ typedef enum {
 
 typedef struct {
     ButtonState_t state;
-    uint32_t timestamp;
+    uint32_t debounce_start_ms;
+    uint32_t press_start_ms;
     uint8_t short_press;
-    uint8_t long_press;
+    int8_t long_press;
 } ButtonCtx_t;
 
 /* Public API */
@@ -44,6 +45,6 @@ void Button_Process(ButtonCtx_t *btn);
 uint8_t Button_WasShortPressed(ButtonCtx_t *btn);
 uint8_t Button_WasLongPressed(ButtonCtx_t *btn);
 
-
-
+/* timing thresholds (ms) */
+#define BTN_LONG_PRESS_MS  800
 #endif /* BUTTON_FSM_H_ */
