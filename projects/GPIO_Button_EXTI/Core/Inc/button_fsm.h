@@ -21,6 +21,7 @@
 
 #include <stdint.h>
 
+/* ===== Button states ===== */
 typedef enum {
     BTN_STATE_IDLE = 0,
     BTN_STATE_DEBOUNCE,
@@ -28,12 +29,19 @@ typedef enum {
     BTN_STATE_LONG
 } ButtonState_t;
 
+/* ===== Button events ===== */
+typedef enum {
+	BTN_EVENT_NONE = 0,
+    BTN_EVENT_SHORT,
+    BTN_EVENT_LONG
+} ButtonEvent_t;
+
+/* ===== Button context ===== */
 typedef struct {
     ButtonState_t state;
     uint32_t debounce_start_ms;
     uint32_t press_start_ms;
-    uint8_t short_press;
-    int8_t long_press;
+    ButtonEvent_t event;
 } ButtonCtx_t;
 
 /* Public API */
@@ -42,9 +50,10 @@ void Button_OnExti(ButtonCtx_t *btn);
 void Button_OnTick(ButtonCtx_t *btn);
 void Button_Process(ButtonCtx_t *btn);
 
-uint8_t Button_WasShortPressed(ButtonCtx_t *btn);
-uint8_t Button_WasLongPressed(ButtonCtx_t *btn);
+ButtonEvent_t Button_GetEvent(ButtonCtx_t *btn);
 
 /* timing thresholds (ms) */
-#define BTN_LONG_PRESS_MS  800
+#define BTN_LONG_PRESS_MS  2000
+#define BTN_DEBOUNCE_MS    30
+
 #endif /* BUTTON_FSM_H_ */

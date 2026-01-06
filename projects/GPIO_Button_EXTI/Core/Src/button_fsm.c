@@ -21,10 +21,7 @@
 
 #include "button_fsm.h"
 #include "main.h"
-
-/* debounce timing (ms) */
-#define BTN_DEBOUNCE_MS  30
-#define BTN_LONG_PRESS_MS 2000
+#include "stm32f1xx_hal.h"
 
 /* internal time base, incremented from TIM ISR */
 static volatile uint32_t btn_time_ms = 0;
@@ -43,8 +40,7 @@ void Button_Init(ButtonCtx_t *btn)
     btn->state = BTN_STATE_IDLE;
     btn->debounce_start_ms = 0;
     btn->press_start_ms = 0;
-    btn->short_press = 0;
-    btn->long_press = 0;
+    btn->event = BTN_EVENT_NONE;
 }
 
 void Button_OnExti(ButtonCtx_t *btn)
@@ -64,63 +60,46 @@ void Button_OnTick(ButtonCtx_t *btn)
 
 void Button_Process(ButtonCtx_t *btn)
 {
-    switch (btn->state) {
+    switch (btn->state)
+    {
+        case BTN_STATE_IDLE:
+            break;
 
-    case BTN_STATE_IDLE:
-        break;
+        case BTN_STATE_DEBOUNCE:
+            if ((btn_time_ms - btn->debounce_start_ms) >= BTN_DEBOUNCE_MS) {
+                if (Button_IsPressed()) {
+                    btn->state = BTN_STATE_PRESSED;
+                    btn->press_start_ms = btn_time_ms;
+                } else {
+                    btn->state = BTN_STATE_IDLE;
+                }
+            }
+            break;
 
-    case BTN_STATE_DEBOUNCE:
-        if ((btn_time_ms - btn->debounce_start_ms) >= BTN_DEBOUNCE_MS) {
+        case BTN_STATE_PRESSED:
             if (Button_IsPressed()) {
-                btn->state = BTN_STATE_PRESSED;
-                btn->press_start_ms = btn_time_ms;   // START long press timing
+                if ((btn_time_ms - btn->press_start_ms) >= BTN_LONG_PRESS_MS) {
+                    btn->event = BTN_EVENT_LONG;
+                    btn->state = BTN_STATE_LONG;
+                }
             } else {
+                btn->event = BTN_EVENT_SHORT;
                 btn->state = BTN_STATE_IDLE;
             }
-        }
-        break;
+            break;
 
-    case BTN_STATE_PRESSED:
-    	if (Button_IsPressed()) {
-        /* long press detected */
-        if ((btn_time_ms - btn->press_start_ms) >= BTN_LONG_PRESS_MS) {
-            btn->long_press = 1;
-            btn->state = BTN_STATE_LONG;}
-        }
-        /* released early → short press */
-        else /*if (!Button_IsPressed())*/ {
-            btn->short_press = 1;
-            btn->state = BTN_STATE_IDLE;
-        }
-        break;
-
-    case BTN_STATE_LONG:
-        /* wait for release */
-        if (!Button_IsPressed()) {
-            btn->state = BTN_STATE_IDLE;
-        }
-        break;
-
-    /*default:
-        btn->state = BTN_STATE_IDLE;
-        break;*/
+        case BTN_STATE_LONG:
+            if (!Button_IsPressed()) {
+                btn->state = BTN_STATE_IDLE;
+            }
+            break;
     }
 }
-
-uint8_t Button_WasShortPressed(ButtonCtx_t *btn)
+ButtonEvent_t Button_GetEvent(ButtonCtx_t *btn)
 {
-    if (btn->short_press) {
-        btn->short_press = 0;
-        return 1;
-    }
-    return 0;
+    ButtonEvent_t evt = btn->event;
+    btn->event = BTN_EVENT_NONE;
+    return evt;
 }
 
-uint8_t Button_WasLongPressed(ButtonCtx_t *btn)
-{
-	if (btn->long_press) {
-	        btn->long_press = 0;
-	        return 1;
-	    }
-    return 0;
-}
+
