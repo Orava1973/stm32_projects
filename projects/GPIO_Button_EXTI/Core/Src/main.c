@@ -123,19 +123,22 @@ int main(void)
   {
       Button_Process(&user_button);
 
-      /* long press → LED ON */
-      if (Button_WasLongPressed(&user_button)) {
-          led_mode = LED_MODE_ON;
-      }
+      switch (Button_GetEvent(&user_button))
+          {
+              case BTN_EVENT_SHORT:
+                  if (led_mode == LED_MODE_OFF)
+                      led_mode = LED_MODE_BLINK;
+                  else
+                      led_mode = LED_MODE_OFF;
+                  break;
 
-      /* short press */
-      if (Button_WasShortPressed(&user_button)) {
-          if (led_mode == LED_MODE_OFF) {
-              led_mode = LED_MODE_BLINK;
-          } else {
-              led_mode = LED_MODE_OFF;
+              case BTN_EVENT_LONG:
+                  led_mode = LED_MODE_ON;
+                  break;
+
+              default:
+                  break;
           }
-      }
 
       /* LED state handling */
       if (led_mode == LED_MODE_ON) {
