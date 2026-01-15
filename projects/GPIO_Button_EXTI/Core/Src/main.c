@@ -22,7 +22,7 @@
 #include "usart.h"
 #include "gpio.h"
 #include "button_fsm.h"
-
+#include "led_fsm.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -35,9 +35,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define SYS_TICK_PERIOD_MS   2
-#define LED_BLINK_PERIOD_MS 500
-#define BUTTON_DEBOUNCE_MS 50
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -48,15 +46,8 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-typedef enum {
-    LED_MODE_OFF = 0,
-    LED_MODE_BLINK,
-    LED_MODE_ON
-} LedMode_t;
-volatile uint32_t sys_tick_ms = 0;
-volatile uint32_t event_led_toggle = 0;
-volatile LedMode_t led_mode = LED_MODE_OFF;
-ButtonCtx_t user_button;
+ButtonCtx_t btn_user;
+ButtonCtx_t btn_aux;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -78,6 +69,19 @@ void SystemClock_Config(void);
  * Project: GPIO_Button_EXTI
  * Source event: EXTI (USER BUTTON)
  */
+/* Application-level LED state (decoupled from LED FSM internals) */
+static LedMode_t app_led_mode = LED_MODE_OFF;
+static uint8_t UserButton_Read(void)
+{
+    /* кнопка активна по LOW */
+    return (HAL_GPIO_ReadPin(USER_BUTTON_GPIO_Port, USER_BUTTON_Pin) == GPIO_PIN_RESET);
+}
+
+uint8_t AuxButton_Read(void)
+{
+
+	return 0;
+}
 /* USER CODE END 0 */
 
 /**
@@ -112,47 +116,48 @@ int main(void)
   MX_USART2_UART_Init();
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
-  //ButtonCtx_t user_button;
   HAL_TIM_Base_Start_IT(&htim2);
-  Button_Init(&user_button);
+  Button_Init(&btn_user, UserButton_Read);
+  Button_Init(&btn_aux,  AuxButton_Read);
+  Led_Init();
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-      Button_Process(&user_button);
+      Button_Process(&btn_user);
+      Button_Process(&btn_aux);
+      Led_Process();
+      switch (Button_GetEvent(&btn_user)) {
+          case BTN_EVENT_SHORT:
+        	  if (app_led_mode == LED_MODE_OFF)
+        	              {app_led_mode = LED_MODE_BLINK;}
+        	          else
+        	              {app_led_mode = LED_MODE_OFF;}
+        	  	  	  Led_SetMode(app_led_mode);
+        	          break;
 
-      switch (Button_GetEvent(&user_button))
-          {
-              case BTN_EVENT_SHORT:
-                  if (led_mode == LED_MODE_OFF)
-                      led_mode = LED_MODE_BLINK;
-                  else
-                      led_mode = LED_MODE_OFF;
-                  break;
-
-              case BTN_EVENT_LONG:
-                  led_mode = LED_MODE_ON;
-                  break;
-
-              default:
-                  break;
-          }
-
-      /* LED state handling */
-      if (led_mode == LED_MODE_ON) {
-          HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
+          case BTN_EVENT_LONG:
+        	  app_led_mode = LED_MODE_ON;
+        	  Led_SetMode(app_led_mode);
+              break;
+          default:
+              break;
       }
-      else if (led_mode == LED_MODE_OFF) {
-          HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
-      }
-  }
+
+      switch (Button_GetEvent(&btn_aux)) {
+          case BTN_EVENT_SHORT:
+              // логика AUX кнопки
+              break;
+          default:
+              break;
+      	  }
+  	  }
 
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-  //}
   /* USER CODE END 3 */
 }
 
@@ -201,22 +206,16 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     if (htim->Instance == TIM2)
     {
     	//HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin); // DEBUG
-    	Button_OnTick(&user_button);
-        if (led_mode == LED_MODE_BLINK)
-        {
-            if (++sys_tick_ms >= (LED_BLINK_PERIOD_MS / SYS_TICK_PERIOD_MS))
-            {
-                HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
-                sys_tick_ms = 0;
-            }
-        }
+    	Button_OnTick(&btn_user);
+    	Button_OnTick(&btn_aux);
+    	Led_OnTick();
     }
 }
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
     if (GPIO_Pin == USER_BUTTON_Pin) {
-        Button_OnExti(&user_button);
+        Button_OnExti(&btn_user);
     }
 }
 
