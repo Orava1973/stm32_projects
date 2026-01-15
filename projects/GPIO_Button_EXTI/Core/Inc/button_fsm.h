@@ -18,6 +18,7 @@
 
 #ifndef BUTTON_FSM_H_
 #define BUTTON_FSM_H_
+#define BUTTON_DEBOUNCE_MS 50
 
 #include <stdint.h>
 
@@ -36,16 +37,20 @@ typedef enum {
     BTN_EVENT_LONG
 } ButtonEvent_t;
 
+/* ===== Button read callback ===== */
+typedef uint8_t (*ButtonReadFn)(void);
+
 /* ===== Button context ===== */
 typedef struct {
     ButtonState_t state;
     uint32_t debounce_start_ms;
     uint32_t press_start_ms;
     ButtonEvent_t event;
+    ButtonReadFn read;
 } ButtonCtx_t;
 
 /* Public API */
-void Button_Init(ButtonCtx_t *btn);
+void Button_Init(ButtonCtx_t *btn, ButtonReadFn read);
 void Button_OnExti(ButtonCtx_t *btn);
 void Button_OnTick(ButtonCtx_t *btn);
 void Button_Process(ButtonCtx_t *btn);
